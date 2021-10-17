@@ -1,0 +1,43 @@
+function prefix_index_object( $rows, $object_id, $facet ) {
+
+// We skip facet IDs different from 9.
+if ( 9 !== $facet['id'] ) {
+return $rows;
+}
+
+$author_id = get_the_author_meta('ID');
+$author_adresse = get_field('adresse', 'user_'. $author_id );
+
+if ( empty( $author_adresse ) ) {
+return $rows;
+}
+if( $location ) {
+$address = '';
+foreach( array('lat') as $i => $k ) {
+if( isset( $location[ $k ] ) ) {
+$lat .= sprintf( '<span>%s</span>', $k, $location[ $k ] );
+}
+}
+
+foreach( array('lng') as $i => $k ) {
+if( isset( $location[ $k ] ) ) {
+$lng .= sprintf( '<span>%s</span>', $k, $location[ $k ] );
+}
+}
+}
+
+$latitude = strip_tags($lat);
+$longitude = strip_tags($lng);
+
+// It may contains several rows (nested arrays).
+// Return rows to insert in the index table.
+return [
+[
+'facet_value' => [ 'lat' => $latitude, 'lng' => $longitude ],
+'facet_name' => 'Map',
+],
+];
+
+}
+
+add_filter( 'wp_grid_builder/indexer/index_object', 'prefix_index_object', 10, 3 );
